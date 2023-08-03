@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Change based on Location</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-image: url('https://static.vecteezy.com/system/resources/previews/003/764/614/original/beautiful-background-with-light-effect-free-vector.jpg');
+            background-size: cover; /* Set the background image to cover the entire screen */
+            background-position: center; /* Center the background image */
+            background-repeat: no-repeat; /* Prevent the background image from repeating */
+            min-height: 100vh; /* Ensure that the background image takes up at least the full viewport height */
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .navbar a:hover {
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 50px auto;
+        }
+
+        h1, p {
+            margin-bottom: 10px;
+        }
+
+        /* Additional styles for introduction text box */
+        .introduction {
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+
+        /* Additional styles for supported languages */
+        body[lang="de"] {
+            font-family: Arial, sans-serif;
+        }
+
+        body[lang="zh"] {
+            font-family: Arial, sans-serif;
+        }
+
+        body[lang="fr"] {
+            font-family: Arial, sans-serif;
+        }
+    </style>
+
+    <!-- Include i18next library -->
+    <script src="https://cdn.jsdelivr.net/npm/i18next/dist/umd/i18next.min.js"></script>
+</head>
+<body>
+    <div class="navbar">
+        <a href="#home" data-i18n="home">Home</a>
+        <a href="#blog" data-i18n="blog">Blog</a>
+        <a href="#products" data-i18n="products">Products</a>
+        <a href="#pricing" data-i18n="pricing">Pricing</a>
+    </div>
+    <div class="container">
+        <h1 id="location">Fetching your location...</h1>
+        <p id="language">Loading...</p>
+    </div>
+
+    <!-- Introduction text box -->
+    <div class="introduction">
+        <h2 data-i18n="introduction">Ipstack</h2>
+        <p data-i18n="introText">Our real-time geolocation API service is used by thousands of developers, SMBs, and large corporations all around the world.</p>
+    </div>
+
+    <script>
+        // Replace 'YOUR_API_KEY' with your actual API key from ipstack
+        const apiKey = 'YOUR_API_KEY';
+        const locationElement = document.getElementById('location');
+        const languageElement = document.getElementById('language');
+
+        // Function to fetch user's location using ipstack API
+        function fetchUserLocation() {
+            fetch(`http://api.ipstack.com/check?access_key=${apiKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    const { city, region_name, country_name, continent_name, location } = data;
+                    const { languages } = location;
+
+                    const languageCode = getLanguageCode(languages);
+                    const locationStr = `${city}, ${region_name}, ${country_name}, ${continent_name}`;
+
+                    locationElement.textContent = `Your location: ${locationStr}`;
+                    languageElement.textContent = `Your language: ${languages[0].name}`;
+                    changeLanguage(languageCode);
+                })
+                .catch(error => {
+                    console.error('Error fetching location:', error);
+                    locationElement.textContent = 'Error fetching your location';
+                });
+        }
+
+        // Function to get the language code based on the user's languages array
+        function getLanguageCode(languages) {
+            const supportedLanguages = ['en', 'ja', 'es', 'de', 'zh', 'fr'];
+            for (const lang of languages) {
+                if (supportedLanguages.includes(lang.code)) {
+                    return lang.code;
+                }
+            }
+            // Return English as the default language if the user's language is not supported
+            return 'en';
+        }
+
+        // Function to change website language based on language code
+        function changeLanguage(languageCode) {
+            i18next.init({
+                lng: languageCode,
+                resources: {
+                    en: {
+                        translation: {
+                            introduction: "Ipstack",
+                            introText: "Our real-time geolocation API service is used by thousands of developers, SMBs, and large corporations all around the world.",
+                            home: "Home",
+                            blog: "Blog",
+                            products: "Products",
+                            pricing: "Pricing"
+                        }
+                    },
+                    ja: {
+                        translation: {
+                            introduction: "アイピースタック",
+                            introText: "当社のリアルタイムジオロケーションAPIサービスは、世界中の数千の開発者、中小企業、大企業に利用されています。",
+                            home: "ホーム",
+                            blog: "ブログ",
+                            products: "製品",
+                            pricing: "価格"
+                        }
+                    },
+                    es: {
+                        translation: {
+                            introduction: "Ipstack",
+                            introText: "Nuestro servicio de API de geolocalización en tiempo real es utilizado por miles de desarrolladores, pequeñas y medianas empresas, y grandes corporaciones en todo el mundo.",
+                            home: "Inicio",
+                            blog: "Blog",
+                            products: "Productos",
+                            pricing: "Precios"
+                        }
+                    },
+                    de: {
+                        translation: {
+                            introduction: "Ipstack",
+                            introText: "Unser Echtzeit-Geolokations-API-Dienst wird von Tausenden von Entwicklern, kleinen und großen Unternehmen auf der ganzen Welt genutzt.",
+                            home: "Startseite",
+                            blog: "Blog",
+                            products: "Produkte",
+                            pricing: "Preise"
+                        }
+                    },
+                    zh: {
+                        translation: {
+                            introduction: "Ipstack",
+                            introText: "我们的实时地理位置API服务被全球数千名开发人员、中小型企业和大型企业使用。",
+                            home: "主页",
+                            blog: "博客",
+                            products: "产品",
+                            pricing: "定价"
+                        }
+                    },
+                    fr: {
+                        translation: {
+                            introduction: "Ipstack",
+                            introText: "Notre service d'API de géolocalisation en temps réel est utilisé par des milliers de développeurs, PME et grandes entreprises du monde entier.",
+                            home: "Accueil",
+                            blog: "Blog",
+                            products: "Produits",
+                            pricing: "Tarification"
+                        }
+                    }
+                }
+            }, function (err, t) {
+                document.querySelector('.introduction h2').textContent = t('introduction');
+                document.querySelector('.introduction p').textContent = t('introText');
+                document.querySelector('.navbar a[data-i18n="home"]').textContent = t('home');
+                document.querySelector('.navbar a[data-i18n="blog"]').textContent = t('blog');
+                document.querySelector('.navbar a[data-i18n="products"]').textContent = t('products');
+                document.querySelector('.navbar a[data-i18n="pricing"]').textContent = t('pricing');
+
+                // Set language attribute on the body tag for applying language-specific styles
+                document.body.setAttribute('lang', languageCode);
+            });
+        }
+
+        // Call the function to get user's location on page load
+        fetchUserLocation();
+    </script>
+</body>
+</html>
